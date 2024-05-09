@@ -25,5 +25,9 @@ void main() async {
     await windowManager.show();
     await windowManager.focus();
   });
+  await Supabase.instance.client.auth.signInWithPassword(
+    email: Credentials.email,
+    password: Credentials.password,
+  );
   runApp(const App());
 }

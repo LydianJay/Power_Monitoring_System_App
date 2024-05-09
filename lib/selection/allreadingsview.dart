@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class AllReadingsView extends StatefulWidget {
@@ -12,11 +15,9 @@ class AllReadingsView extends StatefulWidget {
 
 class _AllReadingsViewState extends State<AllReadingsView> {
   double voltage = 240.2, power = 1200.1, current = 1.2, pf = 2.0;
+  Timer? timer;
 
-  @override
-  Widget build(BuildContext context) {
-    double scrWidth = MediaQuery.of(context).size.width;
-    double scrHeight = MediaQuery.of(context).size.height;
+  Future<Widget> getDataFromDB(double scrWidth, double scrHeight) async {
     return Container(
       width: scrWidth * 0.65,
       height: scrHeight * 0.90,
@@ -276,6 +277,50 @@ class _AllReadingsViewState extends State<AllReadingsView> {
           ),
         ],
       ),
+    );
+  }
+
+  void fetchData() async {
+    debugPrint('Fetching data...');
+    final future = await Supabase.instance.client
+        .from('Reading')
+        .select()
+        .order('id')
+        .limit(1)
+        .single();
+    //final future = await Supabase.instance.client.from('Readings').select();
+
+    debugPrint('Contains: ${future.toString()}');
+
+    voltage = double.parse(future['voltage'].toString());
+    power = double.parse(future['power'].toString());
+    current = double.parse(future['current'].toString());
+    pf = double.parse(future['power_factor'].toString());
+
+    debugPrint('Data Set!');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+    timer = Timer.periodic(const Duration(minutes: 1), (timer) {
+      fetchData();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double scrWidth = MediaQuery.of(context).size.width;
+    double scrHeight = MediaQuery.of(context).size.height;
+    return FutureBuilder(
+      future: getDataFromDB(scrWidth, scrHeight),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        return snapshot.requireData;
+      },
     );
   }
 }

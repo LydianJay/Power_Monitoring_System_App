@@ -1,27 +1,42 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-class VoltageView extends StatefulWidget {
-  const VoltageView({super.key});
+class CurrentReadingsView extends StatefulWidget {
+  const CurrentReadingsView({super.key});
 
   @override
-  State<VoltageView> createState() => _VoltageViewState();
+  State<CurrentReadingsView> createState() => _CurrentReadingsViewState();
 }
 
-class _VoltageViewState extends State<VoltageView> {
+class _CurrentReadingsViewState extends State<CurrentReadingsView> {
   List<double> voltageReadings = [];
-  List<double> voltages = [];
+
   Future<Widget> getDataFromDB(double scrWidth, double scrHeight) async {
+    debugPrint('Fetching data...');
+
+    final future = await Supabase.instance.client
+        .from('Reading')
+        .select('current')
+        .order('id', ascending: true);
+
+    List<double> current = [];
+
+    debugPrint("Data Fetched! ${future.length} Content: ${future.toString()}");
+    debugPrint('List content: ${current.length}');
+    for (var v in future) {
+      debugPrint('Votages: ${v['current']}');
+      current.add(double.parse(v['current'].toString()));
+    }
+    debugPrint('List content: ${current.length}');
+
     return Container(
       margin: const EdgeInsets.only(top: 10),
       child: SfCartesianChart(
-        title: const ChartTitle(text: 'Voltage'),
+        title: const ChartTitle(text: 'Current'),
         series: <LineSeries<double, int>>[
           LineSeries<double, int>(
-            dataSource: voltages,
+            dataSource: current,
             xValueMapper: (d, i) {
               return i;
             },
@@ -32,33 +47,6 @@ class _VoltageViewState extends State<VoltageView> {
         ],
       ),
     );
-  }
-
-  void fetchData() async {
-    debugPrint('Fetching data...');
-
-    final future = await Supabase.instance.client
-        .from('Reading')
-        .select('voltage')
-        .order('id', ascending: true);
-
-    voltages = [];
-
-    debugPrint("Data Fetched! ${future.length} Content: ${future.toString()}");
-    debugPrint('List content: ${voltages.length}');
-    for (var v in future) {
-      debugPrint('Votages: ${v['voltage']}');
-      voltages.add(double.parse(v['voltage'].toString()));
-    }
-    debugPrint('List content: ${voltages.length}');
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    var timer = Timer.periodic(const Duration(minutes: 1), (timer) {
-      fetchData();
-    });
   }
 
   @override

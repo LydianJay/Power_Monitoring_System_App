@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:power_monitoring_system/selection/allreadingsview.dart';
+import 'package:power_monitoring_system/selection/currentreadingsvier.dart';
+import 'package:power_monitoring_system/selection/powerreadingsview.dart';
 import 'package:power_monitoring_system/selection/voltageview.dart';
 import 'package:sidebarx/sidebarx.dart';
 
@@ -18,6 +20,10 @@ class _MainViewState extends State<MainView> {
         return const AllReadingsView();
       case 1:
         return const VoltageView();
+      case 2:
+        return const CurrentReadingsView();
+      case 3:
+        return const PowerReadingsView();
     }
 
     return Text('$selectedIndex');
