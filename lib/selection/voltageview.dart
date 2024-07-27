@@ -16,6 +16,10 @@ class _VoltageViewState extends State<VoltageView> {
   List<double> voltages = [];
   late Timer timer;
   Future<Widget> getDataFromDB(double scrWidth, double scrHeight) async {
+    debugPrint('On Display!!!');
+
+    await fetchData();
+
     return Container(
       margin: const EdgeInsets.only(top: 10),
       child: SfCartesianChart(
@@ -35,7 +39,7 @@ class _VoltageViewState extends State<VoltageView> {
     );
   }
 
-  void fetchData() async {
+  Future<void> fetchData() async {
     debugPrint('Fetching data...');
 
     final future = await Supabase.instance.client
@@ -58,16 +62,18 @@ class _VoltageViewState extends State<VoltageView> {
   void initState() {
     super.initState();
     debugPrint('Init state!');
-    fetchData();
+    // fetchData();
+    // setState(() {});
+
+    // fetchData();
     timer = Timer.periodic(const Duration(minutes: 1), (timer) {
-      setState(() {
-        fetchData();
-      });
+      setState(() {});
     });
   }
 
   @override
   void dispose() {
+    timer.cancel();
     super.dispose();
   }
 
@@ -92,6 +98,7 @@ class _VoltageViewState extends State<VoltageView> {
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
+          debugPrint('Refreshing Voltage DIsplay');
           return snapshot.requireData;
         },
       ),

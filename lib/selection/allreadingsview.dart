@@ -290,16 +290,15 @@ class _AllReadingsViewState extends State<AllReadingsView> {
         .single();
     //final future = await Supabase.instance.client.from('Readings').select();
 
-    debugPrint('Contains: ${future.toString()}');
+    // debugPrint('Contains: ${future.toString()}');
     setState(() {
       voltage = double.parse(future['voltage'].toString());
       power = double.parse(future['power'].toString());
       current = double.parse(future['current'].toString());
       pf = double.parse(future['power_factor'].toString());
     });
-    
 
-    debugPrint('Data Set!');
+    // debugPrint('Data Set!');
   }
 
   @override
@@ -309,6 +308,12 @@ class _AllReadingsViewState extends State<AllReadingsView> {
     timer = Timer.periodic(const Duration(minutes: 1), (timer) {
       fetchData();
     });
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
   }
 
   @override
