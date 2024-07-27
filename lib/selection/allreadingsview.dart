@@ -291,11 +291,13 @@ class _AllReadingsViewState extends State<AllReadingsView> {
     //final future = await Supabase.instance.client.from('Readings').select();
 
     debugPrint('Contains: ${future.toString()}');
-
-    voltage = double.parse(future['voltage'].toString());
-    power = double.parse(future['power'].toString());
-    current = double.parse(future['current'].toString());
-    pf = double.parse(future['power_factor'].toString());
+    setState(() {
+      voltage = double.parse(future['voltage'].toString());
+      power = double.parse(future['power'].toString());
+      current = double.parse(future['current'].toString());
+      pf = double.parse(future['power_factor'].toString());
+    });
+    
 
     debugPrint('Data Set!');
   }

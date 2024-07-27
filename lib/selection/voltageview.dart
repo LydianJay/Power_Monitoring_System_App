@@ -14,6 +14,7 @@ class VoltageView extends StatefulWidget {
 class _VoltageViewState extends State<VoltageView> {
   List<double> voltageReadings = [];
   List<double> voltages = [];
+  late Timer timer;
   Future<Widget> getDataFromDB(double scrWidth, double scrHeight) async {
     return Container(
       margin: const EdgeInsets.only(top: 10),
@@ -56,9 +57,18 @@ class _VoltageViewState extends State<VoltageView> {
   @override
   void initState() {
     super.initState();
-    var timer = Timer.periodic(const Duration(minutes: 1), (timer) {
-      fetchData();
+    debugPrint('Init state!');
+    fetchData();
+    timer = Timer.periodic(const Duration(minutes: 1), (timer) {
+      setState(() {
+        fetchData();
+      });
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
